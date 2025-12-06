@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true })); // For parsing form data
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'react',
+  database: process.env.DB_NAME || 'react-dev',
   password: process.env.DB_PASSWORD || '1234',
   port: process.env.DB_PORT || '',
 });
@@ -29,14 +29,14 @@ pool.connect((err, client, release) => {
   if (err) {
     console.error('❌ Error connecting to PostgreSQL:', err.message);
   } else {
-    console.log('✅ Connected to PostgreSQL database: react');
+    console.log('✅ Connected to PostgreSQL database: react-dev');
     
     // Test table access
-    client.query('SELECT COUNT(*) FROM "posts"', (err, result) => {
+    client.query('SELECT COUNT(*) FROM "testMenu"', (err, result) => {
       if (err) {
         console.error('❌ Table access error:', err.message);
       } else {
-        console.log(`📊 Table "posts" has ${result.rows[0].count} rows`);
+        console.log(`📊 Table "testMenu" has ${result.rows[0].count} rows`);
       }
       release();
     });
@@ -47,7 +47,7 @@ pool.connect((err, client, release) => {
 app.get('/', (req, res) => {
   res.json({
     message: 'PostgreSQL API is running',
-    note: 'Table name is case-sensitive: "posts"',
+    note: 'Table name is case-sensitive: "testMenu"',
     endpoints: {
       getMenu: 'GET /api/menu',
       postMenu: 'POST /api/menu',
@@ -61,7 +61,7 @@ app.get('/api/menu', async (req, res) => {
   console.log('📥 GET /api/menu');
   
   try {
-    const result = await pool.query('SELECT * FROM "posts" ORDER BY id');
+    const result = await pool.query('SELECT * FROM "testMenu" ORDER BY id');
     console.log(`✅ Returning ${result.rows.length} items`);
     res.json(result.rows);
   } catch (err) {
@@ -95,7 +95,7 @@ app.post('/api/menu', async (req, res) => {
     
     // Use parameterized query to prevent SQL injection
     const result = await pool.query(
-      'INSERT INTO "posts" (title, description) VALUES ($1, $2) RETURNING *',
+      'INSERT INTO "testMenu" (title, description) VALUES ($1, $2) RETURNING *',
       [title, description]
     );
     
@@ -109,7 +109,7 @@ app.post('/api/menu', async (req, res) => {
     res.status(500).json({ 
       error: 'Database error',
       details: err.message,
-      hint: 'Table name is case-sensitive. Make sure to use "posts" with quotes.'
+      hint: 'Table name is case-sensitive. Make sure to use "testMenu" with quotes.'
     });
   }
 });
@@ -119,7 +119,7 @@ app.delete('/api/menu/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      'DELETE FROM "posts" WHERE id = $1 RETURNING *',
+      'DELETE FROM "testMenu" WHERE id = $1 RETURNING *',
       [id]
     );
     
