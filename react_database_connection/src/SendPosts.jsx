@@ -1,10 +1,28 @@
-const SendPosts = () => {
-    const inputChangeHandler = () => {
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
+function SendPosts() 
+{
+    const [formData, setFormData] = useState({title:'', description:''});
+
+    const inputChangeHandler = (e) => {
+        const [name, value] = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     }
 
-    const submitHandle = () => {
+    const submitHandle = async (e) => {
+        e.preventDefault();
 
+        try {
+            const response = await axios.post('http://localhost:5000/api/menu', formData);
+
+            setFormData([...formData, response.data]);
+        } catch (err) {
+            console.error('Error adding menu item:', err);
+        }
     }
   return (
     <>
